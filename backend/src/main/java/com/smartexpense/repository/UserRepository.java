@@ -1,0 +1,21 @@
+package com.smartexpense.repository;
+
+import com.smartexpense.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+
+    Optional<User> findByEmail(String email);
+
+    boolean existsByEmail(String email);
+
+    Optional<User> findByProviderAndProviderId(User.Provider provider, String providerId);
+
+    @Query("SELECT u FROM User u WHERE u.email = :email AND u.isActive = true")
+    Optional<User> findActiveByEmail(String email);
+}

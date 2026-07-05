@@ -1,0 +1,137 @@
+spring:
+  application:
+    name: smart-expense-tracker
+
+  # Database
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/smart_expense?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:1234Ansari@}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # JPA / Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 25
+        order_inserts: true
+        order_updates: true
+
+  # OAuth2
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:your-google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:your-google-client-secret}
+            scope:
+              - email
+              - profile
+            redirect-uri: "{baseUrl}/api/auth/oauth2/callback/{registrationId}"
+
+  # File Upload
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 15MB
+
+  # Cache
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=600s
+
+  # Mail
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Server
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /api
+
+spring.jmx.enabled: false
+
+# Force IPv4 to prevent Netty DNS resolver failing on IPv6-unreachable networks
+jvm:
+  options: -Djava.net.preferIPv4Stack=true
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:SmartExpenseTrackerSecretKey256BitsLongForHS256AlgorithmSecurity2024}
+  expiration: 86400000        # 24 hours in ms
+  refresh-expiration: 604800000  # 7 days in ms
+
+# AI (Google Gemini)
+gemini:
+  api:
+    key: ${GEMINI_API_KEY}
+    base-url: https://generativelanguage.googleapis.com/v1beta
+    model: gemini-1.5-flash
+    pro-model: gemini-1.5-pro
+    max-tokens: 2048
+    temperature: 0.7
+
+# Cloudinary
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:your-cloud-name}
+  api-key: ${CLOUDINARY_API_KEY:your-api-key}
+  api-secret: ${CLOUDINARY_API_SECRET:your-api-secret}
+
+# App Config
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  allowed-origins: http://localhost:5173,http://localhost:3000,https://your-app.vercel.app
+  upload:
+    dir: ./uploads
+    max-size: 10485760  # 10MB
+
+# Logging
+logging:
+  level:
+    com.smartexpense: DEBUG
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n"
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  health:
+    mail:
+      enabled: false
