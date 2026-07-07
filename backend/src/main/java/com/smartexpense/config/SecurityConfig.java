@@ -65,28 +65,43 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        
-        List<String> origins = new java.util.ArrayList<>();
-        if (allowedOrigins != null && !allowedOrigins.trim().isEmpty()) {
-            for (String origin : allowedOrigins.split(",")) {
-                origins.add(origin.trim());
-            }
-        } else {
-            origins.add("http://localhost:5173");
-            origins.add("http://localhost:3000");
-        }
+        return new CorsConfigurationSource() {
+            @Override
+            public CorsConfiguration getCorsConfiguration(jakarta.servlet.http.HttpServletRequest request) {
+                String origin = request.getHeader("Origin");
+                CorsConfiguration config = new CorsConfiguration();
                 
-        config.setAllowedOrigins(origins);
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
-        config.setAllowCredentials(true);
-        config.setMaxAge(3600L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
+                boolean isAllowed = false;
+                if (origin != null) {
+                    origin = origin.trim();
+                    if (origin.startsWith("http://localhost:") || 
+                        origin.equals("http://localhost") || 
+                        origin.endsWith(".vercel.app")) {
+                        isAllowed = true;
+                    } else if (allowedOrigins != null && !allowedOrigins.trim().isEmpty()) {
+                        for (String o : allowedOrigins.split(",")) {
+                            if (origin.equals(o.trim())) {
+                                isAllowed = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (isAllowed) {
+                    config.setAllowedOrigins(List.of(origin));
+                } else {
+                    config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
+                }
+                
+                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+                config.setAllowedHeaders(List.of("*"));
+                config.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
+                config.setAllowCredentials(true);
+                config.setMaxAge(3600L);
+                return config;
+            }
+        };
     }
 
     @Bean
