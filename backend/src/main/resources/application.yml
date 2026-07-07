@@ -93,7 +93,7 @@ jwt:
 # AI (Google Gemini)
 gemini:
   api:
-    key: ${GEMINI_API_KEY}
+    key: ${GEMINI_API_KEY:your-gemini-api-key}
     base-url: https://generativelanguage.googleapis.com/v1beta
     model: gemini-1.5-flash
     pro-model: gemini-1.5-pro
@@ -109,7 +109,7 @@ cloudinary:
 # App Config
 app:
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
-  allowed-origins: http://localhost:5173,http://localhost:3000,https://your-app.vercel.app
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,https://your-app.vercel.app}
   upload:
     dir: ./uploads
     max-size: 10485760  # 10MB
