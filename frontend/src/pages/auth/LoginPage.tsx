@@ -220,7 +220,7 @@ export default function LoginPage() {
           {/* Demo fill button */}
           <button
             type="button"
-            onClick={() => handleSubmit(onSubmit)({ email: 'demo@smartexpense.com', password: 'Demo@1234' })}
+            onClick={() => void onSubmit({ email: 'demo@smartexpense.com', password: 'Demo@1234' } as LoginFormData)}
             className="btn-secondary w-full py-2.5 text-sm"
           >
             🚀 Try Demo Account
