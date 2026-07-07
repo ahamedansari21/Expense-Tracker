@@ -257,10 +257,57 @@ public class GeminiService {
     }
 
     // =========================================================
+    // Receipt OCR Data Extraction
+    // =========================================================
+
+    public ReceiptData extractReceiptData(String ocrText) {
+        String prompt = String.format("""
+                Extract expense details from this receipt text and return ONLY JSON:
+
+                Receipt Text:
+                "%s"
+
+                Return:
+                {
+                  "merchant": "...",
+                  "total": 0.0,
+                  "category": "...",
+                  "paymentMethod": "Cash",
+                  "date": "..."
+                }
+
+                Categories: Food & Dining, Transportation, Shopping, Entertainment,
+                Healthcare, Utilities, Rent & Housing, Education, Travel, Others
+                Payment methods: Cash, UPI, Credit Card, Debit Card, Net Banking
+                If a field cannot be determined, use empty string or 0.0 for total.
+                """, ocrText);
+
+        try {
+            String response = generate(prompt);
+            response = response.replaceAll("```json\\s*", "").replaceAll("```\\s*", "").trim();
+
+            JsonNode node = objectMapper.readTree(response);
+
+            return new ReceiptData(
+                    node.path("merchant").asText(""),
+                    node.path("total").asDouble(0.0),
+                    node.path("category").asText("Others"),
+                    node.path("paymentMethod").asText("Cash"),
+                    node.path("date").asText("")
+            );
+
+        } catch (Exception e) {
+            log.error("Error extracting receipt data: {}", e.getMessage());
+            return new ReceiptData("", 0.0, "Others", "Cash", "");
+        }
+    }
+
+    // =========================================================
     // Records
     // =========================================================
 
     public record CategorySuggestion(String category, double confidence, String reasoning) {}
     public record VoiceExpenseParsed(String title, double amount, String merchant,
                                      String category, String paymentMethod, String date, String notes) {}
+    public record ReceiptData(String merchant, double total, String category, String paymentMethod, String date) {}
 }
