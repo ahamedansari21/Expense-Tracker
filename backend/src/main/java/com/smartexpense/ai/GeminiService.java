@@ -303,6 +303,51 @@ public class GeminiService {
     }
 
     // =========================================================
+    // Financial Health Score
+    // =========================================================
+
+    public HealthScore calculateHealthScore(String financialSummary) {
+        String prompt = String.format("""
+                You are a financial advisor. Based on the following financial summary,
+                calculate a health score and return ONLY JSON:
+
+                %s
+
+                Return:
+                {
+                  "score": 75,
+                  "label": "Good",
+                  "tip": "One actionable tip to improve finances"
+                }
+
+                Score ranges:
+                - 0-40: Poor
+                - 41-60: Fair
+                - 61-80: Good
+                - 81-100: Excellent
+
+                Return only valid JSON, no extra text.
+                """, financialSummary);
+
+        try {
+            String response = generate(prompt);
+            response = response.replaceAll("```json\\s*", "").replaceAll("```\\s*", "").trim();
+
+            JsonNode node = objectMapper.readTree(response);
+
+            int score = node.path("score").asInt(65);
+            String label = node.path("label").asText("Good");
+            String tip = node.path("tip").asText("Track your expenses regularly to stay on budget.");
+
+            return new HealthScore(score, label, tip);
+
+        } catch (Exception e) {
+            log.error("Error calculating health score: {}", e.getMessage());
+            return new HealthScore(65, "Good", "Track your expenses regularly to stay on budget.");
+        }
+    }
+
+    // =========================================================
     // Records
     // =========================================================
 
@@ -310,4 +355,5 @@ public class GeminiService {
     public record VoiceExpenseParsed(String title, double amount, String merchant,
                                      String category, String paymentMethod, String date, String notes) {}
     public record ReceiptData(String merchant, double total, String category, String paymentMethod, String date) {}
+    public record HealthScore(int score, String label, String tip) {}
 }
