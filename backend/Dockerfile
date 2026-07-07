@@ -3,20 +3,18 @@
 # Multi-stage build for minimal production image
 # ============================================================
 
-# Stage 1: Build with Maven
-FROM eclipse-temurin:21-jdk-alpine AS builder
+# Stage 1: Build with Maven + JDK 21
+FROM maven:3.9-eclipse-temurin-21-alpine AS builder
 
 WORKDIR /app
 
-# Cache dependencies first
+# Cache dependencies first (copy pom before src for layer caching)
 COPY pom.xml .
-RUN --mount=type=cache,target=/root/.m2 \
-    mvn dependency:go-offline -q 2>/dev/null || true
+RUN mvn dependency:go-offline -q 2>/dev/null || true
 
 COPY src ./src
 
-RUN --mount=type=cache,target=/root/.m2 \
-    mvn package -DskipTests -q
+RUN mvn package -DskipTests -q
 
 # Stage 2: Minimal runtime
 FROM eclipse-temurin:21-jre-alpine AS runtime
