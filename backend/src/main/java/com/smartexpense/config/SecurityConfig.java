@@ -67,9 +67,15 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         
-        List<String> origins = allowedOrigins != null && !allowedOrigins.trim().isEmpty()
-                ? List.of(allowedOrigins.split(","))
-                : List.of("http://localhost:5173", "http://localhost:3000");
+        List<String> origins = new java.util.ArrayList<>();
+        if (allowedOrigins != null && !allowedOrigins.trim().isEmpty()) {
+            for (String origin : allowedOrigins.split(",")) {
+                origins.add(origin.trim());
+            }
+        } else {
+            origins.add("http://localhost:5173");
+            origins.add("http://localhost:3000");
+        }
                 
         config.setAllowedOrigins(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
