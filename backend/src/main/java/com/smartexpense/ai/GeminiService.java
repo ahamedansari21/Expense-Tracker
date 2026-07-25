@@ -67,7 +67,7 @@ public class GeminiService {
             // ✅ FIXED WebClient usage (NO manual full URL)
             String responseJson = geminiWebClient.post()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/models/{model}:generateContent")
+                            .path("/v1beta/models/{model}:generateContent")
                             .queryParam("key", apiKey)
                             .build(modelName)
                     )

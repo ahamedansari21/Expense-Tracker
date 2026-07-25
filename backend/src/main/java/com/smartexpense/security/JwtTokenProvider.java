@@ -25,10 +25,13 @@ public class JwtTokenProvider {
     private long refreshExpiration;
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(
-            java.util.Base64.getEncoder().encodeToString(jwtSecret.getBytes())
-        );
-        return Keys.hmacShaKeyFor(keyBytes);
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] keyBytes = digest.digest(jwtSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return Keys.hmacShaKeyFor(keyBytes);
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new RuntimeException("Failed to initialize JWT signing key: SHA-256 algorithm not found", e);
+        }
     }
 
     /** Generate access token */
