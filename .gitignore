@@ -35,3 +35,6 @@ Thumbs.db
 # Uploads
 uploads/
 temp/
+
+# Database data
+database/data/

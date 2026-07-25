@@ -5,7 +5,7 @@ USE smart_expense;
 
 -- Demo user (password: Demo@1234)
 INSERT INTO users (email, password, full_name, monthly_income, currency, email_verified) VALUES
-('demo@smartexpense.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TiGniMWVaSxQoUDpAJd2OM.T8aWK', 'Demo User', 75000.00, 'INR', TRUE);
+('demo@smartexpense.com', '$2a$12$CCt6iwznmqxPZGGgmuw.wucEVtquWbywujolx/MszmdAPEuX8E47.', 'Demo User', 75000.00, 'INR', TRUE);
 
 SET @user_id = LAST_INSERT_ID();
 
