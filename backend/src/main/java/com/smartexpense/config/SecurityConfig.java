@@ -65,43 +65,31 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        return new CorsConfigurationSource() {
-            @Override
-            public CorsConfiguration getCorsConfiguration(jakarta.servlet.http.HttpServletRequest request) {
-                String origin = request.getHeader("Origin");
-                CorsConfiguration config = new CorsConfiguration();
-                
-                boolean isAllowed = false;
-                if (origin != null) {
-                    origin = origin.trim();
-                    if (origin.startsWith("http://localhost:") || 
-                        origin.equals("http://localhost") || 
-                        origin.endsWith(".vercel.app")) {
-                        isAllowed = true;
-                    } else if (allowedOrigins != null && !allowedOrigins.trim().isEmpty()) {
-                        for (String o : allowedOrigins.split(",")) {
-                            if (origin.equals(o.trim())) {
-                                isAllowed = true;
-                                break;
-                            }
-                        }
-                    }
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        
+        List<String> patterns = new java.util.ArrayList<>();
+        patterns.add("http://localhost:*");
+        patterns.add("https://*.vercel.app");
+        
+        if (allowedOrigins != null && !allowedOrigins.trim().isEmpty()) {
+            for (String origin : allowedOrigins.split(",")) {
+                String trimmed = origin.trim();
+                if (!trimmed.isEmpty()) {
+                    patterns.add(trimmed);
                 }
-                
-                if (isAllowed) {
-                    config.setAllowedOrigins(List.of(origin));
-                } else {
-                    config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
-                }
-                
-                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-                config.setAllowedHeaders(List.of("*"));
-                config.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
-                config.setAllowCredentials(true);
-                config.setMaxAge(3600L);
-                return config;
             }
-        };
+        }
+        
+        config.setAllowedOriginPatterns(patterns);
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean
