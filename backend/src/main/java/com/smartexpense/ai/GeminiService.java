@@ -76,17 +76,16 @@ public class GeminiService {
                     .bodyToMono(String.class)
                     .timeout(Duration.ofSeconds(30))
                     .onErrorResume(e -> {
-    e.printStackTrace();
-    log.error("Gemini API error", e);
-    return Mono.just("{\"candidates\":[]}");
-})
+                        log.error("Gemini API error", e);
+                        return Mono.error(e);
+                    })
                     .block();
 
             return extractTextFromResponse(responseJson);
 
         } catch (Exception e) {
             log.error("Error calling Gemini API: {}", e.getMessage());
-            return "I'm unable to process that request right now. Please try again.";
+            return "Error calling Gemini API: " + e.getMessage() + " (Please verify your GEMINI_API_KEY environment variable in your production hosting dashboard)";
         }
     }
 
