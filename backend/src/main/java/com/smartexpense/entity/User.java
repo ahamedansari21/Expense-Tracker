@@ -33,30 +33,38 @@ public class User implements UserDetails {
 
     private String phone;
 
+    @Builder.Default
     @Column(length = 10)
     private String currency = "INR";
 
+    @Builder.Default
     @Column(name = "monthly_income", precision = 15, scale = 2)
     private BigDecimal monthlyIncome = BigDecimal.ZERO;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private Provider provider = Provider.LOCAL;
 
     @Column(name = "provider_id")
     private String providerId;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
+    @Builder.Default
     @Column(name = "is_active")
     private Boolean isActive = true;
 
+    @Builder.Default
     @Column(name = "email_verified")
     private Boolean emailVerified = false;
 
+    @Builder.Default
     @Column(name = "notification_enabled")
     private Boolean notificationEnabled = true;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "theme_preference")
     private ThemePreference themePreference = ThemePreference.SYSTEM;

@@ -56,6 +56,7 @@ public class AuthService {
                 .role(User.Role.USER)
                 .provider(User.Provider.LOCAL)
                 .themePreference(User.ThemePreference.LIGHT)
+                .isActive(true)
 
                 .build();
 
