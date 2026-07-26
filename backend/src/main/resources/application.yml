@@ -95,8 +95,8 @@ gemini:
   api:
     key: ${GEMINI_API_KEY:your-gemini-api-key}
     base-url: https://generativelanguage.googleapis.com/v1beta
-    model: gemini-3.5-flash
-    pro-model: gemini-3.5-flash
+    model: gemini-1.5-flash
+    pro-model: gemini-1.5-pro
     max-tokens: 2048
     temperature: 0.7
 
